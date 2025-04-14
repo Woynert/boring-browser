@@ -8,6 +8,7 @@ import com.woynert.boringbrowser.databinding.ActivityMainBinding;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.EditText;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     private WebView webView;
+    private EditText tbxUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         webView = findViewById(R.id.webview);
+        tbxUrl = findViewById(R.id.tbx_url);
+
+
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setLoadsImagesAutomatically(false);
@@ -37,6 +42,15 @@ public class MainActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 loadJs(view);
             }
+
+            @Override
+            public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
+
+                tbxUrl.setText(url);
+
+                super.doUpdateVisitedHistory(view, url, isReload);
+            }
+
         });
         webView.loadUrl("https://duckduckgo.com"); // home
     }
