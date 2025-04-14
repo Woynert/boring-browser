@@ -1,14 +1,20 @@
 package com.woynert.boringbrowser;
 
+import android.content.Context;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.ui.AppBarConfiguration;
+
 import com.woynert.boringbrowser.databinding.ActivityMainBinding;
 
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         webView = findViewById(R.id.webview);
         tbxUrl = findViewById(R.id.tbx_url);
 
+        setupUrlBar();
 
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -53,6 +60,31 @@ public class MainActivity extends AppCompatActivity {
 
         });
         webView.loadUrl("https://duckduckgo.com"); // home
+    }
+
+    public void setupUrlBar(){
+        tbxUrl.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
+
+                if (actionId == EditorInfo.IME_ACTION_DONE ||
+                    actionId == EditorInfo.IME_ACTION_NEXT ||
+                    actionId == EditorInfo.IME_ACTION_SEARCH ||
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+
+                    // navigate
+                    String enteredText = tbxUrl.getText().toString();
+                    webView.loadUrl(enteredText);
+
+                    // hide keyboard
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(tbxUrl.getWindowToken(), 0);
+
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
