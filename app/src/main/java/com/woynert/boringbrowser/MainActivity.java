@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private WebView webView;
     private EditText tbxUrl;
+    private String homepage = "https://duckduckgo.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +40,12 @@ public class MainActivity extends AppCompatActivity {
         tbxUrl = findViewById(R.id.tbx_url);
 
         setupUrlBar();
+        setupWebView();
 
+        webView.loadUrl(homepage);
+    }
+
+    public void setupWebView(){
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setLoadsImagesAutomatically(false);
@@ -57,9 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
                 super.doUpdateVisitedHistory(view, url, isReload);
             }
-
         });
-        webView.loadUrl("https://duckduckgo.com"); // home
     }
 
     public void setupUrlBar(){
@@ -77,7 +81,8 @@ public class MainActivity extends AppCompatActivity {
                     webView.loadUrl(enteredText);
 
                     // hide keyboard
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(tbxUrl.getWindowToken(), 0);
 
                     return true;
