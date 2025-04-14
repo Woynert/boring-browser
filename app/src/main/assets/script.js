@@ -19,13 +19,6 @@ img, video {
 
 eStyle.textContent = css;
 
-/* Try to remove some JS */
-
-let r = document.getElementsByTagName('script');
-for (let i = r.length-1; i >= 0; i--) {
-    r[i].remove();
-}
-
 /* Remove iframes */
 
 const TIMEOUT_MS = 3000;
