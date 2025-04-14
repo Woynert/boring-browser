@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.ui.AppBarConfiguration;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.woynert.boringbrowser.databinding.ActivityMainBinding;
 
 import android.view.KeyEvent;
@@ -38,11 +39,14 @@ public class MainActivity extends AppCompatActivity {
 
         webView = findViewById(R.id.webview);
         tbxUrl = findViewById(R.id.tbx_url);
+        findViewById(R.id.btn_home).setOnClickListener(v -> onGoHome());
 
         setupUrlBar();
         setupWebView();
-
         webView.loadUrl(homepage);
+
+        Snackbar.make(webView, "Welcome", Snackbar.LENGTH_LONG)
+            .setAction("Action", null).show();
     }
 
     public void setupWebView(){
@@ -58,9 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
-
                 tbxUrl.setText(url);
-
                 super.doUpdateVisitedHistory(view, url, isReload);
             }
         });
@@ -90,6 +92,10 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    public void onGoHome() {
+        webView.loadUrl(homepage);
     }
 
     @Override
