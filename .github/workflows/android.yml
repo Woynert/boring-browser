@@ -44,7 +44,7 @@ jobs:
         BUILD_TOOLS_VERSION: ${{ env.ANDROID_SDK_VERSION }}
 
     # requires fetch-tags: true
-    - uses: convco/convco-action@v0.2.0
+    - uses: convco/convco-action@v0.3.0
     - name: convco - bump version
       id: bump
       run: |
