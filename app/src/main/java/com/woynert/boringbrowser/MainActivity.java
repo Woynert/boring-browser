@@ -1,26 +1,29 @@
 package com.woynert.boringbrowser;
+import com.woynert.boringbrowser.databinding.ActivityMainBinding;
+
 
 import android.content.Context;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.ui.AppBarConfiguration;
-
-import com.google.android.material.snackbar.Snackbar;
-import com.woynert.boringbrowser.databinding.ActivityMainBinding;
-
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.TextView;
-
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.webkit.WebViewCompat;
+import com.google.android.material.snackbar.Snackbar;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collections;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -29,10 +32,13 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private WebView webView;
     private EditText tbxUrl;
-    private String homepage = "https://duckduckgo.com";
+    private String homepage = "https://google.com";
+    private static final String TAG = "BoringBrowserDebug";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "Startup");
+
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -50,14 +56,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setupWebView(){
+        
+        // Enabling features.
+
         WebSettings webSettings = webView.getSettings();
+
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setSupportZoom(true);
+        webSettings.setBuiltInZoomControls(true);
+
+        webSettings.setDisplayZoomControls(false);
         webSettings.setLoadsImagesAutomatically(false);
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                loadJs(view);
+                // Load JS script.
+                String fileContent = readTextFileFromAssets("script_disable_media.js");
+                webView.loadUrl("javascript:" + fileContent);
             }
 
             @Override
@@ -66,6 +83,29 @@ public class MainActivity extends AppCompatActivity {
                 super.doUpdateVisitedHistory(view, url, isReload);
             }
         });
+
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+                String message = consoleMessage.message();
+                int lineNumber = consoleMessage.lineNumber();
+                String sourceId = consoleMessage.sourceId();
+                ConsoleMessage.MessageLevel level = consoleMessage.messageLevel();
+
+                Log.d(TAG, "[" + level + "] " + message + " -- Line " + lineNumber + " of " + sourceId);
+                return true;
+            }
+        });
+
+        // Disables shadow DOM.
+        // In case DOCUMENT_START_SCRIPT is not supported let it crash.
+
+        String js_disable_shadows = readTextFileFromAssets("script_disable_shadows.js");
+        WebViewCompat.addDocumentStartJavaScript(
+            webView,
+            js_disable_shadows,
+            Collections.singleton("*") // All web domains/origins.
+        );
     }
 
     public void setupUrlBar(){
@@ -105,11 +145,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
-    }
-
-    private void loadJs(WebView pwebView) {
-        String fileContent = readTextFileFromAssets( "script.js");
-        webView.loadUrl("javascript:" + fileContent);
     }
 
     private String readTextFileFromAssets(String fileName) {

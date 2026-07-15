@@ -1,0 +1,41 @@
+
+### Just Build:
+
+Optional cleanup:
+
+```
+\rm -rf ~/.gradle/
+```
+
+Enter dev env:
+
+```
+nix-shell
+steam-run bash
+```
+
+Specify SDK location either in `ANDROID_HOME` env var or add `sdk.dir=/path/to/sdk` in `local.properties`.
+
+```
+export ANDROID_HOME=/plan/2-dev/android/sdk
+./gradlew assembleDebug
+```
+
+### Cli adb phone live debugging
+
+```
+nix-shell
+adb start-server
+steam-run bash
+./gradlew installDebug
+[ At some point you will have to give permission from your phone. ]
+adb uninstall com.woynert.boringbrowser
+adb shell am start -n com.woynert.boringbrowser/.MainActivity
+adb shell run-as com.woynert.boringbrowser logcat --format=color
+```
+
+Run + Launch + Filter logs.
+
+./gradlew installDebug && ./gradlew installDebug && adb shell am start -n com.woynert.boringbrowser/.MainActivity && adb logcat -s BoringBrowserDebug
+
+

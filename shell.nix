@@ -3,10 +3,12 @@ with import <nixpkgs> {};
 mkShell {
 	name = "Android signing";
 	buildInputs = [
-		gradle
 		openssl
-		temurin-jre-bin-17 # keytool
-		# apksigner (also available on the sdk) -> sdk/build-tools/36.0.0/zipalign
+		#temurin-jre-bin-17 # keytool; no JDK
+		openjdk17-bootstrap # keytool; it's actually temurin JRE + JDK
+		android-tools # adb
+		# gradle -> use local ./gradlew script instead
+		# apksigner (also available on the sdk) -> sdk/build-tools/36.0.0/apksigner
 		# zipalign (from sdk, not on the nix store) -> sdk/build-tools/36.0.0/zipalign
 	];
 	shellHook = ''
